@@ -1,18 +1,29 @@
-import { useRouter } from 'next/router';
 import { SubmitHandler, useForm } from 'react-hook-form';
+
+interface UsernameFormProps {
+  onSubmitUsername: Function;
+  label: string;
+  description: string;
+  showCheckbox: boolean;
+}
 
 type LoginFormValues = {
   username: string;
 };
 
-const UsernameForm = () => {
+const UsernameAndRoomForm = ({
+  onSubmitUsername,
+  label,
+  description,
+  showCheckbox,
+}: UsernameFormProps) => {
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<LoginFormValues>();
-  const onSubmit: SubmitHandler<LoginFormValues> = (data) => console.log(data);
-  const router = useRouter();
+  const onSubmit: SubmitHandler<LoginFormValues> = (data) =>
+    onSubmitUsername(data);
 
   return (
     <>
@@ -22,7 +33,7 @@ const UsernameForm = () => {
             Story Pointify
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-600">
-            Der Nutzername ist nur temporär für eine Session gültig
+            {description}
           </p>
         </div>
 
@@ -34,7 +45,7 @@ const UsernameForm = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-neutral-700"
                 >
-                  Anzeigename
+                  {label}
                 </label>
                 <div className="mt-1">
                   <input
@@ -45,24 +56,26 @@ const UsernameForm = () => {
                 </div>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-neutral-900"
-                >
-                  Vergiss mich nicht
-                </label>
-              </div>
+              {showCheckbox && (
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
+                    value={''}
+                  />
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-2 block text-sm text-neutral-900"
+                  >
+                    Vergiss mich nicht
+                  </label>
+                </div>
+              )}
 
               <div>
                 <button
-                  onClick={() => router.push('/rooms')}
                   type="submit"
                   className="flex w-full justify-center rounded-md border border-transparent bg-neutral-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
                 >
@@ -77,4 +90,4 @@ const UsernameForm = () => {
   );
 };
 
-export default UsernameForm;
+export default UsernameAndRoomForm;
