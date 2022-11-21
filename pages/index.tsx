@@ -1,16 +1,9 @@
 import { NextPage } from 'next';
-import { ParseOptions } from 'querystring';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RoomCard from '../components/RoomCard';
 import UsernameAndRoomForm from '../components/UsernameAndRoomForm';
 import VoteCard from '../components/VoteCard';
 import { Participant } from '../interfaces';
-import {
-  getRoomNameState,
-  getUserNameState,
-  setRoomNameState,
-  setUsernameState,
-} from '../states';
 
 const Home: NextPage = () => {
   const [webSocket, setWebSocket] = useState<null | WebSocket>(null);
@@ -18,7 +11,25 @@ const Home: NextPage = () => {
   const [hasRoomName, setHasRoomName] = useState<boolean>(false);
 
   const [participants, setParticipants] = useState<any>([]);
-  const [rooms, setRooms] = useState<any>([]);
+  const [roomName, setRoomName] = useState<string>('');
+
+  const dinos = [
+    'Abelisaurus',
+    'Euoplocephalus',
+    'Liliensternus',
+    'Troodon',
+    'Ultrasauros',
+    'Coelophysis',
+    'Gallimimus',
+    'Halticosaurus',
+    'Daemonosaurus',
+    'Dilophosaurus',
+    'Magyarosaurus',
+  ];
+
+  function getRandomDinoName(): string {
+    return dinos[Math.floor(Math.random() * dinos.length)];
+  }
 
   // useEffect(() => {
   //   return () => {
@@ -26,32 +37,38 @@ const Home: NextPage = () => {
   //   };
   // }, []);
 
-  function handleSubmitUsername(data: { username: string }) {
+  function handleSubmitUsername(data: { formValue: string }) {
     setHasUserName(true);
-    setUsernameState(data.username);
-    connectToWebSocket(data.username);
+    connectToWebSocket(data.formValue);
   }
 
-  function handleSubmitRoomName(data: { username: string }, username: string) {
+  function handleSubmitRoomName(data: { formValue: string }) {
     setHasRoomName(true);
-    setRoomNameState(data.username);
-    joinRoom(data.username);
+    setRoomName(data.formValue);
+    joinRoom(data.formValue);
   }
 
   function handleVoteButtonClick(value: number) {
+    //TODO: Implement Vote Events
     console.log('voted value', value);
   }
 
-  function handleRoomJoined(msg: any) {
-    const participants: Participant[] = [];
-    setParticipants(participants);
+  function handleUserRoomJoined(msg: any) {
+    const participant: Participant = {
+      displayName: msg.sender.name,
+      role: getRandomDinoName(),
+      imageUrl: '',
+      currentVote: '0',
+    };
+
+    setParticipants((prevParticipants: any) => [
+      ...prevParticipants,
+      participant,
+    ]);
   }
 
   function connectToWebSocket(username: string) {
     const webSocket = new WebSocket(`ws://localhost:1337/ws?name=${username}`);
-    webSocket.addEventListener('open', (event) => {
-      console.log('Successfully connected', event);
-    });
     webSocket.addEventListener('message', (event) => {
       handleNewMessage(event);
     });
@@ -59,12 +76,10 @@ const Home: NextPage = () => {
   }
 
   function handleListOnlineClients(msg: any) {
-    console.log(msg);
     const participant: Participant = {
       displayName: msg.sender.name,
-      role: 'Random',
-      imageUrl:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80',
+      role: getRandomDinoName(),
+      imageUrl: '',
       currentVote: '0',
     };
 
@@ -77,9 +92,8 @@ const Home: NextPage = () => {
   function handleUserJoin(msg: any) {
     const participant: Participant = {
       displayName: msg.sender.name,
-      role: 'Random',
-      imageUrl:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80',
+      role: getRandomDinoName(),
+      imageUrl: '',
       currentVote: '0',
     };
 
@@ -88,6 +102,15 @@ const Home: NextPage = () => {
       participant,
     ]);
   }
+
+  const handleUserRoomLeft = (msg: any) => {
+    setParticipants((prevParticipants: any) => {
+      const participantsWithRemovedUser = prevParticipants.filter(
+        (el: Participant) => el.displayName != msg.sender.name
+      );
+      return participantsWithRemovedUser;
+    });
+  };
 
   function joinRoom(roomName: string) {
     webSocket?.send(JSON.stringify({ event: 'join-room', message: roomName }));
@@ -113,17 +136,14 @@ const Home: NextPage = () => {
       let msg = JSON.parse(data[i]);
       console.log(msg);
       switch (msg.event) {
-        case 'send-message':
-          //console.log(msg);
-          break;
         case 'user-join':
           handleUserJoin(msg);
           break;
-        case 'user-left':
-          //console.log(msg);
+        case 'user-room-joined':
+          handleUserRoomJoined(msg);
           break;
-        case 'room-joined':
-          handleRoomJoined(msg);
+        case 'user-room-left':
+          handleUserRoomLeft(msg);
           break;
         case 'list-online-clients':
           handleListOnlineClients(msg);
@@ -148,10 +168,18 @@ const Home: NextPage = () => {
 
   if (hasRoomName && hasUserName) {
     return (
-      <>
-        <RoomCard title={'Placeholder'} participants={participants} />
+      <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-neutral-900">
+            Story Pointify
+          </h2>
+          <p className="mt-2 text-center text-sm text-neutral-600">
+            Weiß nicht mehr was ich hier schreiben wollte
+          </p>
+        </div>
+        <RoomCard title={roomName} participants={participants} />
         <VoteCard className="mt-4" onButtonClicked={handleVoteButtonClick} />
-      </>
+      </div>
     );
   }
 

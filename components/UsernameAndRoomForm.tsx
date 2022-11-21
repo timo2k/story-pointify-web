@@ -8,7 +8,7 @@ interface UsernameFormProps {
 }
 
 type LoginFormValues = {
-  username: string;
+  formValue: string;
 };
 
 const UsernameAndRoomForm = ({
@@ -50,8 +50,8 @@ const UsernameAndRoomForm = ({
                 <div className="mt-1">
                   <input
                     className="block w-full appearance-none rounded-md border border-neutral-300 px-3 py-2 placeholder-neutral-400 shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
-                    {...register('username', { required: true })}
-                    aria-invalid={errors.username ? 'true' : 'false'}
+                    {...register('formValue', { required: true })}
+                    aria-invalid={errors.formValue ? 'true' : 'false'}
                   />
                 </div>
               </div>
