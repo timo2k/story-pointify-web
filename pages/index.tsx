@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import RoomCard from '../components/RoomCard';
 import UsernameAndRoomForm from '../components/UsernameAndRoomForm';
 import VoteCard from '../components/VoteCard';
