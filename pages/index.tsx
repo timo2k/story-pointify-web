@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import { useState } from 'react';
 import RoomCard from '../components/RoomCard';
+import ShowAndHideCard from '../components/ShowAndHideCard';
 import UsernameAndRoomForm from '../components/UsernameAndRoomForm';
 import VoteCard from '../components/VoteCard';
 import { Participant } from '../interfaces';
@@ -12,6 +13,7 @@ const Home: NextPage = () => {
 
   const [participants, setParticipants] = useState<any>([]);
   const [roomName, setRoomName] = useState<string>('');
+  const [roomData, setRoomData] = useState({});
 
   const dinos = [
     'Abelisaurus',
@@ -49,16 +51,46 @@ const Home: NextPage = () => {
   }
 
   function handleVoteButtonClick(value: number) {
-    //TODO: Implement Vote Events
-    console.log('voted value', value);
+    setRoomData((prevRoomData: any) => {
+      console.log(prevRoomData);
+      webSocket?.send(
+        JSON.stringify({
+          event: 'send-estimation',
+          message: String(value),
+          target: prevRoomData,
+        })
+      );
+      return prevRoomData;
+    });
+  }
+
+  function handleHideButtonClick() {
+    //TODO: Implement hide estimations events
+    console.log('Hide Buttton clicked');
+  }
+
+  function handleShowButtonClick() {
+    //TODO: Implement show estimations events
+    console.log('Show Button clicked');
+  }
+
+  function handleParticipantEstimation(msg: any) {
+    setParticipants((prevParticipants: any) => {
+      prevParticipants.find(
+        (participant: any) => participant.id === msg.sender.id
+      ).currentVote = msg.sender['current-estimation'];
+      console.log('updated', prevParticipants);
+      return [...prevParticipants];
+    });
   }
 
   function handleUserRoomJoined(msg: any) {
     const participant: Participant = {
+      id: msg.sender.id,
       displayName: msg.sender.name,
       role: getRandomDinoName(),
       imageUrl: '',
-      currentVote: '0',
+      currentVote: msg.sender['current-estimation'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -77,10 +109,11 @@ const Home: NextPage = () => {
 
   function handleListOnlineClients(msg: any) {
     const participant: Participant = {
+      id: msg.sender.id,
       displayName: msg.sender.name,
       role: getRandomDinoName(),
       imageUrl: '',
-      currentVote: '0',
+      currentVote: msg.sender['current-estimation'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -91,10 +124,11 @@ const Home: NextPage = () => {
 
   function handleUserJoin(msg: any) {
     const participant: Participant = {
+      id: msg.sender.id,
       displayName: msg.sender.name,
       role: getRandomDinoName(),
       imageUrl: '',
-      currentVote: '0',
+      currentVote: msg.sender['current-estimation'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -116,17 +150,6 @@ const Home: NextPage = () => {
     webSocket?.send(JSON.stringify({ event: 'join-room', message: roomName }));
   }
 
-  // OnSendEstimation    = "send-estimation"
-  // OnResetEstimations  = "reset-estimations"
-  // OnHideEstimations   = "hide-estimations"
-  // OnRevealEstimations = "reveal-estimations"
-  // OnSendMessage       = "send-message"
-  // OnJoinRoom          = "join-room"
-  // OnLeaveRoom         = "leave-room"
-  // OnUserJoined        = "user-join"
-  // OnUserLeft          = "user-left"
-  // OnRoomJoined        = "room-joined"
-
   function handleNewMessage(event: any) {
     console.log(event);
     let data = event.data;
@@ -135,6 +158,7 @@ const Home: NextPage = () => {
     for (let i = 0; i < data.length; i++) {
       let msg = JSON.parse(data[i]);
       console.log(msg);
+      console.log('EVENT', msg.event);
       switch (msg.event) {
         case 'user-join':
           handleUserJoin(msg);
@@ -147,6 +171,14 @@ const Home: NextPage = () => {
           break;
         case 'list-online-clients':
           handleListOnlineClients(msg);
+          break;
+        case 'room-joined':
+          setRoomData(msg.target);
+          break;
+        case 'send-estimation':
+          console.log('FUCKER');
+          handleParticipantEstimation(msg);
+          break;
         default:
           break;
       }
@@ -158,7 +190,7 @@ const Home: NextPage = () => {
       <>
         <UsernameAndRoomForm
           onSubmitUsername={handleSubmitRoomName}
-          showCheckbox={true}
+          showCheckbox={false}
           label="Gib Raumname"
           description="Wenn der gesuchte Raum nicht existiert, wird ein neuer angelegt!"
         />
@@ -177,7 +209,15 @@ const Home: NextPage = () => {
             Weiß nicht mehr was ich hier schreiben wollte
           </p>
         </div>
-        <RoomCard title={roomName} participants={participants} />
+        <ShowAndHideCard
+          onHideButtonClicked={handleHideButtonClick}
+          onShowButtonClicked={handleShowButtonClick}
+        />
+        <RoomCard
+          className="mt-4"
+          title={roomName}
+          participants={participants}
+        />
         <VoteCard className="mt-4" onButtonClicked={handleVoteButtonClick} />
       </div>
     );
