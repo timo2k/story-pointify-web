@@ -67,6 +67,16 @@ const Home: NextPage = () => {
   function handleHideButtonClick() {
     //TODO: Implement hide estimations events
     console.log('Hide Buttton clicked');
+    setRoomData((prevRoomData: any) => {
+      webSocket?.send(
+        JSON.stringify({
+          event: 'toggle-hide-estimations',
+          message: 'hide-estimations',
+          target: prevRoomData,
+        })
+      );
+      return prevRoomData;
+    });
   }
 
   function handleShowButtonClick() {
@@ -178,6 +188,9 @@ const Home: NextPage = () => {
         case 'send-estimation':
           console.log('FUCKER');
           handleParticipantEstimation(msg);
+          break;
+        case 'toggle-hide-estimations':
+          console.log('toogle-hide-estimations server response');
           break;
         default:
           break;
