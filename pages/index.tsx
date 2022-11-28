@@ -9,8 +9,6 @@ import { Participant } from '../interfaces';
 import { getWebSocket, setWebSocket } from '../socket';
 
 const Home: NextPage = () => {
-  // const [webSocket, setWebSocket] = useState<null | WebSocket>(null);
-  const [formValue, setFormValue] = useState<string>('');
   const [hasUserName, setHasUserName] = useState<boolean>(false);
   const [hasRoomName, setHasRoomName] = useState<boolean>(false);
 
