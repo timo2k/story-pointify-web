@@ -1,29 +1,21 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 interface UsernameFormProps {
-  onSubmitUsername: Function;
-  label: string;
-  description: string;
-  showCheckbox: boolean;
+  onSubmitFormValue: Function;
 }
 
-type LoginFormValues = {
+type UsernameFormValues = {
   formValue: string;
 };
 
-const UsernameAndRoomForm = ({
-  onSubmitUsername,
-  label,
-  description,
-  showCheckbox,
-}: UsernameFormProps) => {
+const UsernameForm = ({ onSubmitFormValue }: UsernameFormProps) => {
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<LoginFormValues>();
-  const onSubmit: SubmitHandler<LoginFormValues> = (data) =>
-    onSubmitUsername(data);
+  } = useForm<UsernameFormValues>();
+  const onSubmit: SubmitHandler<UsernameFormValues> = (data) =>
+    onSubmitFormValue(data);
 
   return (
     <>
@@ -33,7 +25,7 @@ const UsernameAndRoomForm = ({
             Story Pointify
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-600">
-            {description}
+            Der Nutzername ist nur temporär für eine Session gültig
           </p>
         </div>
 
@@ -45,7 +37,7 @@ const UsernameAndRoomForm = ({
                   htmlFor="email"
                   className="block text-sm font-medium text-neutral-700"
                 >
-                  {label}
+                  Anzeigename
                 </label>
                 <div className="mt-1">
                   <input
@@ -56,23 +48,20 @@ const UsernameAndRoomForm = ({
                 </div>
               </div>
 
-              {showCheckbox && (
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
-                    value={''}
-                  />
-                  <label
-                    htmlFor="remember-me"
-                    className="ml-2 block text-sm text-neutral-900"
-                  >
-                    Vergiss mich nicht
-                  </label>
-                </div>
-              )}
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-neutral-900"
+                >
+                  Vergiss mich nicht
+                </label>
+              </div>
 
               <div>
                 <button
@@ -90,4 +79,4 @@ const UsernameAndRoomForm = ({
   );
 };
 
-export default UsernameAndRoomForm;
+export default UsernameForm;
