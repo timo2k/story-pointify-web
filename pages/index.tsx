@@ -15,24 +15,6 @@ const Home: NextPage = () => {
   const [roomName, setRoomName] = useState<string>('');
   const [roomData, setRoomData] = useState<any>({});
 
-  const dinos = [
-    'Abelisaurus',
-    'Euoplocephalus',
-    'Liliensternus',
-    'Troodon',
-    'Ultrasauros',
-    'Coelophysis',
-    'Gallimimus',
-    'Halticosaurus',
-    'Daemonosaurus',
-    'Dilophosaurus',
-    'Magyarosaurus',
-  ];
-
-  function getRandomDinoName(): string {
-    return dinos[Math.floor(Math.random() * dinos.length)];
-  }
-
   // useEffect(() => {
   //   return () => {
   //     connectToWebSocket('TRI');
@@ -106,7 +88,7 @@ const Home: NextPage = () => {
     const participant: Participant = {
       id: msg.sender.id,
       displayName: msg.sender.name,
-      role: getRandomDinoName(),
+      role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
     };
@@ -129,7 +111,7 @@ const Home: NextPage = () => {
     const participant: Participant = {
       id: msg.sender.id,
       displayName: msg.sender.name,
-      role: getRandomDinoName(),
+      role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
     };
@@ -144,7 +126,7 @@ const Home: NextPage = () => {
     const participant: Participant = {
       id: msg.sender.id,
       displayName: msg.sender.name,
-      role: getRandomDinoName(),
+      role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
     };
