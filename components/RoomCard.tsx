@@ -3,10 +3,16 @@ import { Participant } from '../interfaces';
 interface RoomCardProps {
   className?: string;
   title: string;
+  hasHiddenEstimations: boolean;
   participants: Participant[];
 }
 
-const RoomCard = ({ className, title, participants }: RoomCardProps) => {
+const RoomCard = ({
+  className,
+  title,
+  participants,
+  hasHiddenEstimations,
+}: RoomCardProps) => {
   return (
     <div
       className={
@@ -34,7 +40,7 @@ const RoomCard = ({ className, title, participants }: RoomCardProps) => {
                   </div>
                 </li>
                 <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-0.5 text-sm font-medium text-gray-800">
-                  {participant.currentVote || '???'}
+                  {hasHiddenEstimations ? '???' : participant.currentVote}
                 </span>
               </div>
             ))}

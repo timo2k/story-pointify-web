@@ -13,7 +13,7 @@ const Home: NextPage = () => {
 
   const [participants, setParticipants] = useState<any>([]);
   const [roomName, setRoomName] = useState<string>('');
-  const [roomData, setRoomData] = useState({});
+  const [roomData, setRoomData] = useState<any>({});
 
   const dinos = [
     'Abelisaurus',
@@ -52,7 +52,6 @@ const Home: NextPage = () => {
 
   function handleVoteButtonClick(value: number) {
     setRoomData((prevRoomData: any) => {
-      console.log(prevRoomData);
       webSocket?.send(
         JSON.stringify({
           event: 'send-estimation',
@@ -65,13 +64,11 @@ const Home: NextPage = () => {
   }
 
   function handleHideButtonClick() {
-    //TODO: Implement hide estimations events
-    console.log('Hide Buttton clicked');
     setRoomData((prevRoomData: any) => {
       webSocket?.send(
         JSON.stringify({
           event: 'toggle-hide-estimations',
-          message: 'hide-estimations',
+          message: 'hide',
           target: prevRoomData,
         })
       );
@@ -80,8 +77,20 @@ const Home: NextPage = () => {
   }
 
   function handleShowButtonClick() {
-    //TODO: Implement show estimations events
-    console.log('Show Button clicked');
+    setRoomData((prevRoomData: any) => {
+      webSocket?.send(
+        JSON.stringify({
+          event: 'toggle-hide-estimations',
+          message: 'show',
+          target: prevRoomData,
+        })
+      );
+      return prevRoomData;
+    });
+  }
+
+  function toggleHideEstimations(msg: any) {
+    setRoomData(msg.target);
   }
 
   function handleParticipantEstimation(msg: any) {
@@ -89,7 +98,6 @@ const Home: NextPage = () => {
       prevParticipants.find(
         (participant: any) => participant.id === msg.sender.id
       ).currentVote = msg.sender['current-estimation'];
-      console.log('updated', prevParticipants);
       return [...prevParticipants];
     });
   }
@@ -161,14 +169,11 @@ const Home: NextPage = () => {
   }
 
   function handleNewMessage(event: any) {
-    console.log(event);
     let data = event.data;
     data = data.split(/\r?\n/);
 
     for (let i = 0; i < data.length; i++) {
       let msg = JSON.parse(data[i]);
-      console.log(msg);
-      console.log('EVENT', msg.event);
       switch (msg.event) {
         case 'user-join':
           handleUserJoin(msg);
@@ -186,11 +191,10 @@ const Home: NextPage = () => {
           setRoomData(msg.target);
           break;
         case 'send-estimation':
-          console.log('FUCKER');
           handleParticipantEstimation(msg);
           break;
         case 'toggle-hide-estimations':
-          console.log('toogle-hide-estimations server response');
+          toggleHideEstimations(msg);
           break;
         default:
           break;
@@ -227,6 +231,7 @@ const Home: NextPage = () => {
           onShowButtonClicked={handleShowButtonClick}
         />
         <RoomCard
+          hasHiddenEstimations={roomData['has-hidden-estimations']}
           className="mt-4"
           title={roomName}
           participants={participants}
