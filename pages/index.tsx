@@ -1,13 +1,16 @@
 import { NextPage } from 'next';
 import { useState } from 'react';
 import RoomCard from '../components/RoomCard';
+import RoomForm from '../components/RoomForm';
 import ShowAndHideCard from '../components/ShowAndHideCard';
-import UsernameAndRoomForm from '../components/UsernameAndRoomForm';
+import UsernameForm from '../components/UsernameForm';
 import VoteCard from '../components/VoteCard';
 import { Participant } from '../interfaces';
+import { getWebSocket, setWebSocket } from '../socket';
 
 const Home: NextPage = () => {
-  const [webSocket, setWebSocket] = useState<null | WebSocket>(null);
+  // const [webSocket, setWebSocket] = useState<null | WebSocket>(null);
+  const [formValue, setFormValue] = useState<string>('');
   const [hasUserName, setHasUserName] = useState<boolean>(false);
   const [hasRoomName, setHasRoomName] = useState<boolean>(false);
 
@@ -34,7 +37,7 @@ const Home: NextPage = () => {
 
   function handleVoteButtonClick(value: number) {
     setRoomData((prevRoomData: any) => {
-      webSocket?.send(
+      getWebSocket()?.send(
         JSON.stringify({
           event: 'send-estimation',
           message: String(value),
@@ -47,7 +50,7 @@ const Home: NextPage = () => {
 
   function handleHideButtonClick() {
     setRoomData((prevRoomData: any) => {
-      webSocket?.send(
+      getWebSocket()?.send(
         JSON.stringify({
           event: 'toggle-hide-estimations',
           message: 'hide',
@@ -60,7 +63,7 @@ const Home: NextPage = () => {
 
   function handleShowButtonClick() {
     setRoomData((prevRoomData: any) => {
-      webSocket?.send(
+      getWebSocket()?.send(
         JSON.stringify({
           event: 'toggle-hide-estimations',
           message: 'show',
@@ -105,6 +108,7 @@ const Home: NextPage = () => {
       handleNewMessage(event);
     });
     setWebSocket(webSocket);
+    //setWebSocket(webSocket);
   }
 
   function handleListOnlineClients(msg: any) {
@@ -147,7 +151,9 @@ const Home: NextPage = () => {
   };
 
   function joinRoom(roomName: string) {
-    webSocket?.send(JSON.stringify({ event: 'join-room', message: roomName }));
+    getWebSocket()?.send(
+      JSON.stringify({ event: 'join-room', message: roomName })
+    );
   }
 
   function handleNewMessage(event: any) {
@@ -187,12 +193,7 @@ const Home: NextPage = () => {
   if (hasUserName && !hasRoomName) {
     return (
       <>
-        <UsernameAndRoomForm
-          onSubmitUsername={handleSubmitRoomName}
-          showCheckbox={false}
-          label="Gib Raumname"
-          description="Wenn der gesuchte Raum nicht existiert, wird ein neuer angelegt!"
-        />
+        <RoomForm onSubmitFormValue={handleSubmitRoomName} />
       </>
     );
   }
@@ -225,12 +226,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <UsernameAndRoomForm
-        onSubmitUsername={handleSubmitUsername}
-        showCheckbox={true}
-        label="Anzeigename"
-        description="Der Nutzername ist nur temporär für eine Session gültig"
-      />
+      <UsernameForm onSubmitFormValue={handleSubmitUsername} />
     </>
   );
 };
