@@ -101,7 +101,9 @@ const Home: NextPage = () => {
   }
 
   function connectToWebSocket(username: string) {
-    const webSocket = new WebSocket(`ws://localhost:1337/ws?name=${username}`);
+    const webSocket = new WebSocket(
+      `ws://room-data.story-pointify.app/ws?name=${username}`
+    );
     webSocket.addEventListener('message', (event) => {
       handleNewMessage(event);
     });
