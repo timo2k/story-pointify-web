@@ -16,12 +16,6 @@ const Home: NextPage = () => {
   const [roomName, setRoomName] = useState<string>('');
   const [roomData, setRoomData] = useState<any>({});
 
-  // useEffect(() => {
-  //   return () => {
-  //     connectToWebSocket('TRI');
-  //   };
-  // }, []);
-
   function handleSubmitUsername(data: { formValue: string }) {
     setHasUserName(true);
     connectToWebSocket(data.formValue);
