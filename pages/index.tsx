@@ -68,6 +68,18 @@ const Home: NextPage = () => {
 
   function toggleHideEstimations(msg: any) {
     setRoomData(msg.target);
+
+    if (!msg.target['has-hidden-estimations']) {
+      setParticipants((prevParticipants: Participant[]) => {
+        const updatedParticipants = prevParticipants.map(
+          (participant: Participant) => {
+            return { ...participant, hasChangedEstimation: false };
+          }
+        );
+
+        return updatedParticipants;
+      });
+    }
   }
 
   function handleParticipantEstimation(msg: any) {
@@ -75,6 +87,15 @@ const Home: NextPage = () => {
       prevParticipants.find(
         (participant: any) => participant.id === msg.sender.id
       ).currentVote = msg.sender['current-estimation'];
+
+      if (msg.target['has-hidden-estimations']) {
+        prevParticipants.find(
+          (participant: any) =>
+            participant.id === msg.sender.id &&
+            msg.target['has-hidden-estimations']
+        ).hasChangedEstimation = true;
+      }
+
       return [...prevParticipants];
     });
   }
@@ -86,6 +107,7 @@ const Home: NextPage = () => {
       role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
+      hasChangedEstimation: false,
     };
 
     setParticipants((prevParticipants: any) => [
@@ -102,7 +124,6 @@ const Home: NextPage = () => {
       handleNewMessage(event);
     });
     setWebSocket(webSocket);
-    //setWebSocket(webSocket);
   }
 
   function handleListOnlineClients(msg: any) {
@@ -112,6 +133,7 @@ const Home: NextPage = () => {
       role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
+      hasChangedEstimation: false,
     };
 
     setParticipants((prevParticipants: any) => [
@@ -127,6 +149,7 @@ const Home: NextPage = () => {
       role: msg.sender.title,
       imageUrl: '',
       currentVote: msg.sender['current-estimation'],
+      hasChangedEstimation: false,
     };
 
     setParticipants((prevParticipants: any) => [
