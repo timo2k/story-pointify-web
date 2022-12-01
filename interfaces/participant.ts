@@ -4,4 +4,5 @@ export interface Participant {
   role: string;
   imageUrl: string;
   currentVote?: string;
+  hasChangedEstimation: boolean;
 }
