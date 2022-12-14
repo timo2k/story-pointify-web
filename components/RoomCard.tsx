@@ -30,9 +30,9 @@ const RoomCard = ({
               <div key={index} className="flex justify-between items-center">
                 <li className="group flex items-center space-x-4 rounded-xl">
                   <img
-                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80"
+                    src={participant.imageUrl}
                     alt=""
-                    className="h-10 w-10 flex-none rounded-full"
+                    className="h-10 w-10 flex-none object-cover rounded-full"
                   />
                   <div className="flex-auto">
                     <p className="text-gray-900">{participant.displayName}</p>

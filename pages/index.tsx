@@ -7,6 +7,7 @@ import UsernameForm from '../components/UsernameForm';
 import VoteCard from '../components/VoteCard';
 import { Participant } from '../interfaces';
 import { getWebSocket, setWebSocket } from '../socket';
+import {generateDinoImageLink} from "../utils";
 
 const Home: NextPage = () => {
   const [hasUserName, setHasUserName] = useState<boolean>(false);
@@ -105,7 +106,7 @@ const Home: NextPage = () => {
       id: msg.sender.id,
       displayName: msg.sender.name,
       role: msg.sender.title,
-      imageUrl: '',
+      imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
     };
@@ -131,7 +132,7 @@ const Home: NextPage = () => {
       id: msg.sender.id,
       displayName: msg.sender.name,
       role: msg.sender.title,
-      imageUrl: '',
+      imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
     };
@@ -147,7 +148,7 @@ const Home: NextPage = () => {
       id: msg.sender.id,
       displayName: msg.sender.name,
       role: msg.sender.title,
-      imageUrl: '',
+      imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
     };
