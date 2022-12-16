@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Participant } from '../interfaces';
 
 interface RoomCardProps {
@@ -29,10 +30,12 @@ const RoomCard = ({
             {participants.map((participant, index) => (
               <div key={index} className="flex justify-between items-center">
                 <li className="group flex items-center space-x-4 rounded-xl">
-                  <img
+                  <Image
                     src={participant.imageUrl}
-                    alt=""
-                    className="h-10 w-10 flex-none object-cover rounded-full"
+                    width={40}
+                    height={40}
+                    alt="dino avatar"
+                    className="h-10 w-10 flex-none rounded-full"
                   />
                   <div className="flex-auto">
                     <p className="text-gray-900">{participant.displayName}</p>
