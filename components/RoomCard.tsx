@@ -4,6 +4,7 @@ import { Participant } from '../interfaces';
 interface RoomCardProps {
   className?: string;
   title: string;
+  showEstimations: boolean;
   hasHiddenEstimations: boolean;
   participants: Participant[];
 }
@@ -13,6 +14,7 @@ const RoomCard = ({
   title,
   participants,
   hasHiddenEstimations,
+  showEstimations,
 }: RoomCardProps) => {
   return (
     <div
@@ -42,17 +44,19 @@ const RoomCard = ({
                     <p className="mt-0.5">{participant.role}</p>
                   </div>
                 </li>
-                <span
-                  className={
-                    participant.hasChangedEstimation
-                      ? 'bg-green-200 ' +
-                        ' inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium text-gray-800'
-                      : 'bg-gray-100' +
-                        ' inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium text-gray-800'
-                  }
-                >
-                  {hasHiddenEstimations ? '???' : participant.currentVote}
-                </span>
+                {showEstimations && (
+                  <span
+                    className={
+                      participant.hasChangedEstimation
+                        ? 'bg-green-200 ' +
+                          ' inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium text-gray-800'
+                        : 'bg-gray-100' +
+                          ' inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium text-gray-800'
+                    }
+                  >
+                    {hasHiddenEstimations ? '???' : participant.currentVote}
+                  </span>
+                )}
               </div>
             ))}
           </ol>

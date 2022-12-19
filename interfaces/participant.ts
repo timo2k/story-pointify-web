@@ -5,4 +5,5 @@ export interface Participant {
   imageUrl: string;
   currentVote?: string;
   hasChangedEstimation: boolean;
+  isSpectator: boolean;
 }

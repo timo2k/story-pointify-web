@@ -5,7 +5,8 @@ interface RoomFormProps {
 }
 
 type RoomFormValues = {
-  formValue: string;
+  roomName: string;
+  isSpectator: boolean;
 };
 
 const RoomForm = ({ onSubmitFormValue }: RoomFormProps) => {
@@ -33,19 +34,28 @@ const RoomForm = ({ onSubmitFormValue }: RoomFormProps) => {
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-neutral-700"
-                >
+                <label className="block text-sm font-medium text-neutral-700">
                   Gib Raumname
                 </label>
                 <div className="mt-1">
                   <input
                     className="block w-full appearance-none rounded-md border border-neutral-300 px-3 py-2 placeholder-neutral-400 shadow-sm focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
-                    {...register('formValue', { required: true })}
-                    aria-invalid={errors.formValue ? 'true' : 'false'}
+                    {...register('roomName', { required: true })}
+                    aria-invalid={errors.roomName ? 'true' : 'false'}
                   />
                 </div>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  {...register('isSpectator', { required: false })}
+                  className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
+                />
+                <label className="ml-2 block text-sm text-neutral-900">
+                  Ich möchte als stiller Zuschauer den Raum erstellen oder
+                  beitreten und micht nicht an den Schätzungen beteiligen.
+                </label>
               </div>
 
               <div>
