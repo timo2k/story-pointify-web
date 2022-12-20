@@ -224,6 +224,16 @@ const Home: NextPage = () => {
   }
 
   if (hasRoomName && hasUserName) {
+    const spectatingParticipants = participants.filter(
+      (participant: Participant) => participant.isSpectator
+    );
+
+    const nonSpecatingParticipants = participants.filter(
+      (participant: Participant) => !participant.isSpectator
+    );
+
+    console.log(nonSpecatingParticipants);
+
     return (
       <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
@@ -239,24 +249,26 @@ const Home: NextPage = () => {
           onHideButtonClicked={handleHideButtonClick}
           onShowButtonClicked={handleShowButtonClick}
         />
-        <RoomCard
-          hasHiddenEstimations={roomData['has-hidden-estimations']}
-          className="mt-4"
-          title="Zuschauer"
-          participants={participants.filter(
-            (participant: Participant) => participant.isSpectator
-          )}
-          showEstimations={false}
-        />
-        <RoomCard
-          hasHiddenEstimations={roomData['has-hidden-estimations']}
-          className="mt-4"
-          title={`Teilnehmer`}
-          participants={participants.filter(
-            (participant: Participant) => !participant.isSpectator
-          )}
-          showEstimations={true}
-        />
+        {spectatingParticipants.length > 0 && (
+          <RoomCard
+            hasHiddenEstimations={roomData['has-hidden-estimations']}
+            className="mt-4"
+            title="Zuschauer"
+            participants={spectatingParticipants}
+            showEstimations={false}
+          />
+        )}
+
+        {nonSpecatingParticipants.length > 0 && (
+          <RoomCard
+            hasHiddenEstimations={roomData['has-hidden-estimations']}
+            className="mt-4"
+            title={`Teilnehmer`}
+            participants={nonSpecatingParticipants}
+            showEstimations={true}
+          />
+        )}
+
         {!isSpectator && (
           <VoteCard className="mt-4" onButtonClicked={handleVoteButtonClick} />
         )}
