@@ -1,1 +1,1 @@
-export const WEBSOCKET_URL = process.env.WEBSOCKET_URL || 'ws:/localhost:1337'
+export const WEBSOCKET_URL = 'ws://room-data.story-pointify.app';
