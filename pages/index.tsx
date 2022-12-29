@@ -5,9 +5,10 @@ import RoomForm from '../components/RoomForm';
 import ShowAndHideCard from '../components/ShowAndHideCard';
 import UsernameForm from '../components/UsernameForm';
 import VoteCard from '../components/VoteCard';
+import { WEBSOCKET_URL } from '../consts';
 import { Participant } from '../interfaces';
 import { getWebSocket, setWebSocket } from '../socket';
-import {generateDinoImageLink} from "../utils";
+import { generateDinoImageLink } from '../utils';
 
 const Home: NextPage = () => {
   const [hasUserName, setHasUserName] = useState<boolean>(false);
@@ -16,16 +17,18 @@ const Home: NextPage = () => {
   const [participants, setParticipants] = useState<any>([]);
   const [roomName, setRoomName] = useState<string>('');
   const [roomData, setRoomData] = useState<any>({});
+  const [isSpectator, setIsSpectator] = useState<boolean>(false);
 
   function handleSubmitUsername(data: { formValue: string }) {
     setHasUserName(true);
     connectToWebSocket(data.formValue);
   }
 
-  function handleSubmitRoomName(data: { formValue: string }) {
+  function handleSubmitRoomData(data: any) {
     setHasRoomName(true);
-    setRoomName(data.formValue);
-    joinRoom(data.formValue);
+    setRoomName(data.roomName);
+    setIsSpectator(data.isSpectator);
+    joinRoom(data);
   }
 
   function handleVoteButtonClick(value: number) {
@@ -109,6 +112,7 @@ const Home: NextPage = () => {
       imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
+      isSpectator: msg.sender['is-spectator'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -118,9 +122,7 @@ const Home: NextPage = () => {
   }
 
   function connectToWebSocket(username: string) {
-    const webSocket = new WebSocket(
-      `ws://room-data.story-pointify.app/ws?name=${username}`
-    );
+    const webSocket = new WebSocket(`${WEBSOCKET_URL}/ws?name=${username}`);
     webSocket.addEventListener('message', (event) => {
       handleNewMessage(event);
     });
@@ -135,6 +137,7 @@ const Home: NextPage = () => {
       imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
+      isSpectator: msg.sender['is-spectator'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -151,6 +154,7 @@ const Home: NextPage = () => {
       imageUrl: generateDinoImageLink(msg.sender.title),
       currentVote: msg.sender['current-estimation'],
       hasChangedEstimation: false,
+      isSpectator: msg.sender['is-spectator'],
     };
 
     setParticipants((prevParticipants: any) => [
@@ -168,9 +172,12 @@ const Home: NextPage = () => {
     });
   };
 
-  function joinRoom(roomName: string) {
+  function joinRoom(data: any) {
     getWebSocket()?.send(
-      JSON.stringify({ event: 'join-room', message: roomName })
+      JSON.stringify({
+        event: 'join-room',
+        message: `${data.roomName};${data.isSpectator}`,
+      })
     );
   }
 
@@ -211,33 +218,60 @@ const Home: NextPage = () => {
   if (hasUserName && !hasRoomName) {
     return (
       <>
-        <RoomForm onSubmitFormValue={handleSubmitRoomName} />
+        <RoomForm onSubmitFormValue={handleSubmitRoomData} />
       </>
     );
   }
 
   if (hasRoomName && hasUserName) {
+    const spectatingParticipants = participants.filter(
+      (participant: Participant) => participant.isSpectator
+    );
+
+    const nonSpecatingParticipants = participants.filter(
+      (participant: Participant) => !participant.isSpectator
+    );
+
+    console.log(nonSpecatingParticipants);
+
     return (
       <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-neutral-900">
-            Story Pointify
+            {roomName}
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-600">
-            Weiß nicht mehr was ich hier schreiben wollte
+            Das ist ein wirklich toller Name für einen Raum! Herzlichen
+            Glückwunsch! 🎉
           </p>
         </div>
         <ShowAndHideCard
           onHideButtonClicked={handleHideButtonClick}
           onShowButtonClicked={handleShowButtonClick}
         />
-        <RoomCard
-          hasHiddenEstimations={roomData['has-hidden-estimations']}
-          className="mt-4"
-          title={roomName}
-          participants={participants}
-        />
-        <VoteCard className="mt-4" onButtonClicked={handleVoteButtonClick} />
+        {spectatingParticipants.length > 0 && (
+          <RoomCard
+            hasHiddenEstimations={roomData['has-hidden-estimations']}
+            className="mt-4"
+            title="Zuschauer"
+            participants={spectatingParticipants}
+            showEstimations={false}
+          />
+        )}
+
+        {nonSpecatingParticipants.length > 0 && (
+          <RoomCard
+            hasHiddenEstimations={roomData['has-hidden-estimations']}
+            className="mt-4"
+            title={`Teilnehmer`}
+            participants={nonSpecatingParticipants}
+            showEstimations={true}
+          />
+        )}
+
+        {!isSpectator && (
+          <VoteCard className="mt-4" onButtonClicked={handleVoteButtonClick} />
+        )}
       </div>
     );
   }

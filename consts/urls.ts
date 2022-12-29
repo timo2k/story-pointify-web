@@ -1,0 +1,1 @@
+export const WEBSOCKET_URL = process.env.WEBSOCKET_URL || 'ws:/localhost:1337'

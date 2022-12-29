@@ -48,21 +48,6 @@ const UsernameForm = ({ onSubmitFormValue }: UsernameFormProps) => {
                 </div>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-neutral-900"
-                >
-                  Vergiss mich nicht
-                </label>
-              </div>
-
               <div>
                 <button
                   type="submit"
